@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "seafile.fullname" . }}
+  labels: {{ include "seafile.labels" . | nindent 4 }}
+spec:
+  serviceName: {{ include "seafile.fullname" . }}
+  replicas: {{ if .Values.seafile.pause }} 0 {{ else }} 1 {{ end }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "seafile.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "seafile.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.seafile.podSecurityContext | nindent 8 }}
+      {{- if .Values.seafile.persistence.existingClaim }}
+      volumes:
+      - name: seafile-data
+        persistentVolumeClaim:
+          claimName: {{ .Values.seafile.persistence.existingClaim }}
+      {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+      {{ toYaml .Values.nodeSelector | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: seafile
+        securityContext:
+          {{- toYaml .Values.seafile.securityContext | nindent 10 }}
+        image: {{ .Values.seafile.image }}
+        imagePullPolicy: Always
+        env: {{ toYaml .Values.seafile.environment | nindent 8 }}
+        - name: SEAFILE_MYSQL_DB_HOST
+          value: {{ .Values.seafile.database.hostname | quote }}
+        - name: INIT_SEAFILE_MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.seafile.database.rootPasswordSecret.name }}
+              key: {{ .Values.seafile.database.rootPasswordSecret.key }}
+        - name: SEAFILE_SERVER_LETSENCRYPT
+          value: "false"
+        - name: FORCE_HTTPS_IN_CONF
+          value: "true"
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        - name: webdav
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+        - name: seafile-data
+          mountPath: /shared
+  {{- if not .Values.seafile.persistence.existingClaim }}
+  volumeClaimTemplates:
+  - metadata:
+      name: seafile-data
+      annotations:
+        helm.sh/resource-policy: keep
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.seafile.persistence.storageClassName }}
+      storageClassName: {{ .Values.seafile.persistence.storageClassName }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.seafile.persistence.size }}
+  {{- end }}

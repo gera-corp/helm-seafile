@@ -1,0 +1,80 @@
+# Default values for seafile-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+memcached:
+  enabled: true
+  serviceFqdn: seafile-memcached
+  resourcesPreset: "small"
+
+mariadb:
+  enabled: true
+
+redis:
+  enabled: true
+  global:
+    redis:
+      password: "redis"
+  architecture: standalone
+
+seafile:
+  image: docker.io/seafileltd/seafile-mc:13.0.8
+  pause: false
+  persistence:
+    size: 10Gi
+    storageClassName: {}
+    existingClaim: {}
+  database:
+    hostname: seafile-mariadb
+    rootPasswordSecret:
+      name: seafile-mariadb
+      key: mariadb-root-password
+  podSecurityContext: {}
+  securityContext: {}
+  environment:
+  - name: TIME_ZONE
+    value: "Etc/UTC"
+  - name: INIT_SEAFILE_ADMIN_EMAIL
+    value: ""
+  - name: INIT_SEAFILE_ADMIN_PASSWORD
+    value: ""
+  - name: SEAFILE_SERVER_HOSTNAME
+    value: ""
+  - name: JWT_PRIVATE_KEY
+    value: "" #  pwgen -s 40 1
+  - name: SEAFILE_MYSQL_DB_USER
+    value: ""
+  - name: SEAFILE_MYSQL_DB_PASSWORD
+    value: ""
+  - name: SEAFILE_MYSQL_DB_PORT
+    value: "3306"
+  - name: SEAFILE_MYSQL_DB_CCNET_DB_NAME
+    value: ccnet_db
+  - name: SEAFILE_MYSQL_DB_SEAFILE_DB_NAME
+    value: seafile_db
+  - name: SEAFILE_MYSQL_DB_SEAHUB_DB_NAME
+    value: seahub_db
+  - name: CACHE_PROVIDER
+    value: redis
+  - name: REDIS_HOST
+    value: ""
+  - name: REDIS_PORT
+    value: "6379"
+  - name: REDIS_PASSWORD
+    value: ""
+  - name: SEAFILE_SERVER_PROTOCOL
+    value: https
+
+nodeSelector: {}
+
+ingress:
+  annotations:
+    # use NGINX Ingress Controller
+    kubernetes.io/spec.ingressClassName: ""
+    # use Cert-Manager for LetsEncrypt Certificates
+    # cert-manager.io/issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: ""
+  host: ""
+  tls:
+    host: ""
+    secretName: {}
