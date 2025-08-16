@@ -20,4 +20,5 @@ The chart is published as an OCI artifact in the GitHub Container Registry (GHCR
 helm install seafile oci://ghcr.io/gera-corp/helm-charts/seafile \
   --version 0.1.1 \
   --namespace seafile \
-  --create-namespace
+  --create-namespace \
+  --values YOUR-VALUES.yaml
