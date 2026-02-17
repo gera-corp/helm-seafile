@@ -12,10 +12,12 @@ spec:
     targetPort: http
     protocol: TCP
     name: http
+{{- if .Values.seafile.webdav.enabled }}
   - port: 8080
     targetPort: http-webdav
     protocol: TCP
     name: http-webdav
+{{- end }}
   selector:
     app.kubernetes.io/name: {{ include "seafile.name" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}

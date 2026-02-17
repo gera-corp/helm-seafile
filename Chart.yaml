@@ -1,7 +1,7 @@
 apiVersion: v2
 name: seafile
 type: application
-version: 0.1.3
+version: 0.1.4
 appVersion: 13.0.17
 icon: https://www.seafile.com/media/img/seafile-logo.png
 home: https://github.com/gera-corp/helm-seafile
@@ -18,10 +18,10 @@ maintainers:
 kubeVersion: ">=1.16.0-0"
 annotations:
   artifacthub.io/changes: |
-    - Update to Seafile 13.0.8
+    - Update to Seafile 13.0.17
   artifacthub.io/images: |
     - name: Seafile
-      image: docker.io/seafileltd/seafile-mc:13.0.8
+      image: docker.io/seafileltd/seafile-mc:13.0.17
   artifacthub.io/maintainers: |
     - name: gera
       email: exandore@gmail.com

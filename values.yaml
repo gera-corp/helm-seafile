@@ -29,6 +29,8 @@ seafile:
     rootPasswordSecret:
       name: seafile-mariadb
       key: mariadb-root-password
+  webdav:
+    enabled: false
   podSecurityContext: {}
   securityContext: {}
   environment:
