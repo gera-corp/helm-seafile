@@ -18,7 +18,7 @@ redis:
   architecture: standalone
 
 seafile:
-  image: docker.io/seafileltd/seafile-mc:13.0.8
+  image: docker.io/seafileltd/seafile-mc:13.0.17
   pause: false
   persistence:
     size: 10Gi
